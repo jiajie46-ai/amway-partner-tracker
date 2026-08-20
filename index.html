@@ -310,6 +310,7 @@
       <thead>
         <tr>
           <th data-key="name">姓名</th>
+          <th data-key="region">地區</th>
           <th data-key="amwayId">安利編號</th>
           <th data-key="login">登入帳號</th>
           <th data-key="password">密碼</th>
@@ -341,6 +342,10 @@
     <div class="field">
       <label>姓名</label>
       <input id="f_name" placeholder="例：Lee Jia Jie" />
+    </div>
+    <div class="field">
+      <label>地區</label>
+      <input id="f_region" placeholder="例：台灣 / 馬來西亞" />
     </div>
     <div class="field-row">
       <div class="field">
@@ -493,6 +498,7 @@ function render(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><b>${escapeHtml(p.name||'')}</b></td>
+      <td>${escapeHtml(p.region||'')}</td>
       <td class="id-code">${escapeHtml(String(p.amwayId||''))}</td>
       <td>${escapeHtml(p.login||'')}</td>
       <td class="pw">${escapeHtml(p.password||'')}</td>
@@ -537,6 +543,7 @@ function openModal(id){
 
   const p = isEdit ? (partners.find(x=>x.id===id) || {}) : {};
   document.getElementById('f_name').value = p.name || '';
+  document.getElementById('f_region').value = p.region || '';
   document.getElementById('f_amwayId').value = p.amwayId || '';
   document.getElementById('f_referrer').value = p.referrer || '';
   document.getElementById('f_localReferrer').value = p.localReferrer || '';
@@ -562,6 +569,7 @@ async function handleSave(){
   const record = {
     id: id || uid(),
     name,
+    region: document.getElementById('f_region').value,
     amwayId: document.getElementById('f_amwayId').value.trim(),
     referrer: document.getElementById('f_referrer').value.trim(),
     localReferrer: document.getElementById('f_localReferrer').value.trim(),
@@ -603,8 +611,8 @@ async function handleDelete(){
 }
 
 function exportCsv(){
-  const headers = ['姓名','安利編號','登入帳號','密碼','國際推薦','當地推薦人','續約日期','加入日期','備註'];
-  const rows = partners.map(p=>[p.name,p.amwayId,p.login,p.password,p.referrer,p.localReferrer,p.renewDate,p.joinDate,p.note]);
+  const headers = ['姓名','地區','安利編號','登入帳號','密碼','國際推薦','當地推薦人','續約日期','加入日期','備註'];
+  const rows = partners.map(p=>[p.name,p.region,p.amwayId,p.login,p.password,p.referrer,p.localReferrer,p.renewDate,p.joinDate,p.note]);
   const csv = [headers, ...rows].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -670,7 +678,7 @@ function renderTreeNode(p, childrenMap, depth, pathNames){
       <div class="tree-card">
         <button class="tree-toggle ${hasKids?'':'leaf'}" data-toggle="${nodeId}">${hasKids?'－':''}</button>
         <div class="tree-info">
-          <div class="tree-name"><span class="tree-gen">第${depth}代</span>${escapeHtml(p.name||'')} ${p.amwayId?('<span class="id-code">#'+escapeHtml(String(p.amwayId))+'</span>'):''}</div>
+          <div class="tree-name"><span class="tree-gen">第${depth}代</span>${escapeHtml(p.name||'')} ${p.amwayId?('<span class="id-code">#'+escapeHtml(String(p.amwayId))+'</span>'):''} ${p.region?('<span class="id-code">· '+escapeHtml(p.region)+'</span>'):''}</div>
           <div class="tree-meta">${renewBadge(p.renewDate)}</div>
           ${pathHtml}
         </div>
